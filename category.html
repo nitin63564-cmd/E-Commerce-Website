@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categories - ShopVerse</title>
+  <meta name="description" content="Browse all product categories at ShopVerse. Electronics, Fashion, Home & Living, Sports, Books, Beauty and more.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .category-hero-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+    .category-hero-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+    .cat-hero-img { height: 240px; overflow: hidden; position: relative; }
+    .cat-hero-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .category-hero-card:hover .cat-hero-img img { transform: scale(1.08); }
+    .cat-hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(13,13,26,0.9) 100%);
+    }
+    .cat-hero-body { padding: 24px; }
+    .cat-hero-icon {
+      width: 52px; height: 52px; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 14px;
+    }
+    .cat-hero-body h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .cat-hero-body p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+    .cat-product-count {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(108,99,255,0.15); color: var(--primary-light);
+      padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    /* Category Product Section */
+    .cat-section { margin-bottom: 64px; }
+    .cat-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+    }
+    .cat-section-title { display: flex; align-items: center; gap: 12px; }
+    .cat-section-title .icon {
+      width: 42px; height: 42px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .cat-section-title h2 { font-size: 20px; font-weight: 700; }
+
+    .category-list-sidebar {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 24px; margin-bottom: 32px;
+    }
+    .cat-list { display: flex; gap: 12px; flex-wrap: wrap; }
+    .cat-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 18px; border-radius: 50px;
+      background: var(--dark-3); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: var(--transition); text-decoration: none;
+    }
+    .cat-pill:hover, .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+  </style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="page-hero-content">
+        <div class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span><i class="fas fa-chevron-right" style="font-size:10px"></i></span>
+          <span>Categories</span>
+        </div>
+        <h1>Shop by <span style="color:var(--primary-light)">Category</span></h1>
+        <p>Browse our wide selection of product categories and find what you love</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <!-- Category List (navigation pills) -->
+      <div class="category-list-sidebar">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <i class="fas fa-list" style="color:var(--primary)"></i>
+          <strong style="font-size:14px">Category List</strong>
+        </div>
+        <div class="cat-list" id="catPills">
+          <a class="cat-pill active" href="#all">All Categories</a>
+        </div>
+      </div>
+
+      <!-- Category Cards Grid -->
+      <div class="section-header">
+        <span class="section-label">All Collections</span>
+        <h2 class="section-title">Our <span>Categories</span></h2>
+        <p class="section-subtitle">Explore our curated collections across every product category</p>
+      </div>
+
+      <div class="grid grid-3" id="categoryHeroGrid"></div>
+
+      <!-- Products by Category -->
+      <div id="categoryProductSections" style="margin-top:80px"></div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-placeholder"></div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+  renderLayout('category');
+
+  const catImages = {
+    'Electronics': 'https://images.unsplash.com/photo-1526406915894-7bcd65f60845?w=600&q=80',
+    'Fashion': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80',
+    'Home & Living': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
+    'Sports': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80',
+    'Books': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&q=80',
+    'Beauty': 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80',
+  };
+
+  // Build pills
+  const pillsEl = document.getElementById('catPills');
+  categories.forEach(cat => {
+    pillsEl.innerHTML += `<a class="cat-pill" href="#cat-${cat.id}" style="color:${cat.color}" onclick="smoothScroll('#cat-${cat.id}',event)">
+      <i class="${cat.icon}"></i> ${cat.name}
+    </a>`;
+  });
+
+  function smoothScroll(id, e) {
+    e.preventDefault();
+    const el = document.querySelector(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Build category cards grid
+  const grid = document.getElementById('categoryHeroGrid');
+  grid.innerHTML = categories.map(cat => {
+    const catProds = products.filter(p => p.category === cat.name);
+    return `
+    <a href="products.html?cat=${encodeURIComponent(cat.name)}" class="category-hero-card" style="text-decoration:none">
+      <div class="cat-hero-img">
+        <img src="${catImages[cat.name]}" alt="${cat.name}"
+          onerror="this.src='https://placehold.co/600x240/1A1A35/6C63FF?text=${cat.name}'">
+        <div class="cat-hero-overlay"></div>
+      </div>
+      <div class="cat-hero-body">
+        <div class="cat-hero-icon" style="background:${cat.color}22;color:${cat.color}">
+          <i class="${cat.icon}"></i>
+        </div>
+        <h3>${cat.name}</h3>
+        <p>${cat.description}</p>
+        <div class="cat-product-count"><i class="fas fa-box"></i> ${catProds.length} Products</div>
+        <div>
+          <span class="btn btn-outline btn-sm">Browse ${cat.name} <i class="fas fa-arrow-right"></i></span>
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+
+  // Build product sections per category
+  const sectionsEl = document.getElementById('categoryProductSections');
+  sectionsEl.innerHTML = categories.map(cat => {
+    const catProds = products.filter(p => p.category === cat.name);
+    if (!catProds.length) return '';
+    return `
+    <div class="cat-section" id="cat-${cat.id}">
+      <div class="cat-section-header">
+        <div class="cat-section-title">
+          <div class="icon" style="background:${cat.color}22;color:${cat.color}"><i class="${cat.icon}"></i></div>
+          <div>
+            <h2>${cat.name}</h2>
+            <span style="font-size:13px;color:var(--text-muted)">${catProds.length} products available</span>
+          </div>
+        </div>
+        <a href="products.html?cat=${encodeURIComponent(cat.name)}" class="btn btn-outline btn-sm">
+          View All <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      <div class="grid grid-4">
+        ${catProds.slice(0, 4).map(p => renderProductCard(p)).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Check URL param
+  const urlParams = new URLSearchParams(window.location.search);
+  const preselected = urlParams.get('cat');
+  if (preselected) {
+    const cat = categories.find(c => c.name === preselected);
+    if (cat) {
+      setTimeout(() => document.getElementById(`cat-${cat.id}`)?.scrollIntoView({ behavior: 'smooth' }), 300);
+    }
+  }
+</script>
+</body>
+</html>

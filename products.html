@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products - ShopVerse</title>
+  <meta name="description" content="Browse all products at ShopVerse. Filter by category and price range to find exactly what you need.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .products-layout { display: grid; grid-template-columns: 280px 1fr; gap: 32px; align-items: start; }
+    .filter-sidebar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      position: sticky;
+      top: calc(var(--nav-height) + 20px);
+    }
+    .filter-section { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+    .filter-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .filter-title { font-size: 13px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+    .price-display { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-top: 10px; }
+    .products-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 14px 20px; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
+    }
+    .toolbar-left { display: flex; align-items: center; gap: 12px; }
+    .results-count { font-size: 14px; color: var(--text-muted); }
+    .results-count strong { color: var(--text); }
+    .toolbar-right { display: flex; align-items: center; gap: 10px; }
+    .sort-select {
+      padding: 8px 14px; background: var(--dark-3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text); font-size: 13px; font-family: inherit;
+      outline: none; cursor: pointer;
+    }
+    .view-toggle { display: flex; gap: 4px; }
+    .view-btn {
+      width: 36px; height: 36px; border-radius: var(--radius-sm);
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: var(--transition); font-size: 14px;
+    }
+    .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .products-grid.list-view { grid-template-columns: 1fr; }
+    .products-grid.list-view .product-card { display: grid; grid-template-columns: 200px 1fr auto; }
+    .products-grid.list-view .product-card-img { height: 160px; }
+    .products-grid.list-view .product-card-footer { display: flex; align-items: flex-end; }
+    .active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .filter-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(108,99,255,0.15); border: 1px solid var(--primary);
+      color: var(--primary-light); padding: 4px 12px; border-radius: 50px;
+      font-size: 12px; font-weight: 600;
+    }
+    .filter-tag button { background: none; border: none; color: inherit; cursor: pointer; font-size: 12px; padding: 0; }
+    .no-products {
+      grid-column: 1 / -1; text-align: center; padding: 80px 20px;
+      color: var(--text-muted);
+    }
+    .no-products i { font-size: 60px; color: var(--text-light); margin-bottom: 20px; display: block; }
+    @media (max-width: 1024px) {
+      .products-layout { grid-template-columns: 1fr; }
+      .filter-sidebar { position: static; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .products-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<main>
+  <!-- PAGE HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="page-hero-content">
+        <div class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span><i class="fas fa-chevron-right" style="font-size:10px"></i></span>
+          <span>Products</span>
+        </div>
+        <h1>All <span style="color:var(--primary-light)">Products</span></h1>
+        <p>Discover our complete collection of premium products</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:40px">
+    <div class="container">
+      <div class="products-layout">
+        <!-- FILTER SIDEBAR -->
+        <aside class="filter-sidebar">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+            <h2 style="font-size:16px;font-weight:700">Filters</h2>
+            <button onclick="clearAllFilters()" class="btn btn-ghost btn-sm">Clear All</button>
+          </div>
+
+          <!-- Category Filter -->
+          <div class="filter-section">
+            <div class="filter-title"><i class="fas fa-tags" style="margin-right:8px;color:var(--primary)"></i>Category</div>
+            <div class="checkbox-group" id="categoryFilters"></div>
+          </div>
+
+          <!-- Price Range Filter -->
+          <div class="filter-section">
+            <div class="filter-title"><i class="fas fa-dollar-sign" style="margin-right:8px;color:var(--primary)"></i>Price Range</div>
+            <input type="range" id="priceRange" min="0" max="1300" value="1300" oninput="updatePriceFilter(this.value)">
+            <div class="price-display">
+              <span>$0</span>
+              <span id="priceDisplay">Up to $1,300</span>
+            </div>
+          </div>
+
+          <!-- Rating Filter -->
+          <div class="filter-section">
+            <div class="filter-title"><i class="fas fa-star" style="margin-right:8px;color:#F59E0B"></i>Min Rating</div>
+            <div class="checkbox-group">
+              <label class="checkbox-item"><input type="radio" name="ratingFilter" value="0" checked onchange="applyFilters()"> All Ratings</label>
+              <label class="checkbox-item"><input type="radio" name="ratingFilter" value="4.5" onchange="applyFilters()"> ★★★★★ 4.5+</label>
+              <label class="checkbox-item"><input type="radio" name="ratingFilter" value="4" onchange="applyFilters()"> ★★★★ 4.0+</label>
+              <label class="checkbox-item"><input type="radio" name="ratingFilter" value="3" onchange="applyFilters()"> ★★★ 3.0+</label>
+            </div>
+          </div>
+
+          <!-- Availability -->
+          <div class="filter-section">
+            <div class="filter-title"><i class="fas fa-check-circle" style="margin-right:8px;color:var(--accent)"></i>Availability</div>
+            <div class="checkbox-group">
+              <label class="checkbox-item"><input type="checkbox" id="inStockOnly" onchange="applyFilters()"> In Stock Only</label>
+            </div>
+          </div>
+
+          <button onclick="applyFilters()" class="btn btn-primary btn-full"><i class="fas fa-filter"></i> Apply Filters</button>
+        </aside>
+
+        <!-- PRODUCTS MAIN -->
+        <div>
+          <!-- Active Filters -->
+          <div class="active-filters" id="activeFilters"></div>
+
+          <!-- Toolbar -->
+          <div class="products-toolbar">
+            <div class="toolbar-left">
+              <span class="results-count">Showing <strong id="productCount">0</strong> products</span>
+            </div>
+            <div class="toolbar-right">
+              <label style="font-size:13px;color:var(--text-muted)">Sort by:</label>
+              <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+                <option value="default">Featured</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="rating">Best Rated</option>
+                <option value="newest">Newest</option>
+              </select>
+              <div class="view-toggle">
+                <button class="view-btn active" id="gridViewBtn" onclick="setView('grid')" title="Grid View"><i class="fas fa-th"></i></button>
+                <button class="view-btn" id="listViewBtn" onclick="setView('list')" title="List View"><i class="fas fa-list"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Products Grid -->
+          <div class="products-grid" id="productsGrid"></div>
+
+          <!-- Pagination -->
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-placeholder"></div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+  renderLayout('products');
+
+  let maxPrice = 1300;
+  let selectedCategories = [];
+  let currentPage = 1;
+  const perPage = 9;
+  let isGridView = true;
+
+  // Read URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const preselectedCat = urlParams.get('cat');
+
+  // Build category filters
+  const catFiltersEl = document.getElementById('categoryFilters');
+  catFiltersEl.innerHTML = categories.map(cat => `
+    <label class="checkbox-item">
+      <input type="checkbox" class="cat-filter" value="${cat.name}" onchange="applyFilters()"
+        ${preselectedCat === cat.name ? 'checked' : ''}>
+      ${cat.name} <span style="color:var(--text-light);margin-left:auto;font-size:11px">(${products.filter(p=>p.category===cat.name).length})</span>
+    </label>`).join('');
+
+  function updatePriceFilter(val) {
+    maxPrice = parseInt(val);
+    document.getElementById('priceDisplay').textContent = `Up to $${parseInt(val).toLocaleString()}`;
+    applyFilters();
+  }
+
+  function applyFilters() {
+    selectedCategories = [...document.querySelectorAll('.cat-filter:checked')].map(c => c.value);
+    const minRating = parseFloat(document.querySelector('input[name="ratingFilter"]:checked').value);
+    const inStockOnly = document.getElementById('inStockOnly').checked;
+    const sortVal = document.getElementById('sortSelect').value;
+
+    let filtered = products.filter(p => {
+      if (selectedCategories.length && !selectedCategories.includes(p.category)) return false;
+      if (p.price > maxPrice) return false;
+      if (p.rating < minRating) return false;
+      if (inStockOnly && !p.inStock) return false;
+      return true;
+    });
+
+    if (sortVal === 'price-asc') filtered.sort((a,b) => a.price - b.price);
+    else if (sortVal === 'price-desc') filtered.sort((a,b) => b.price - a.price);
+    else if (sortVal === 'rating') filtered.sort((a,b) => b.rating - a.rating);
+
+    renderProducts(filtered);
+    renderActiveFilters();
+  }
+
+  function renderProducts(list) {
+    const grid = document.getElementById('productsGrid');
+    const count = document.getElementById('productCount');
+    count.textContent = list.length;
+
+    if (list.length === 0) {
+      grid.innerHTML = `<div class="no-products"><i class="fas fa-search"></i><h3>No products found</h3><p>Try adjusting your filters</p></div>`;
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+
+    const start = (currentPage - 1) * perPage;
+    const paged = list.slice(start, start + perPage);
+    grid.innerHTML = paged.map(p => renderProductCard(p)).join('');
+
+    // Pagination
+    const totalPages = Math.ceil(list.length / perPage);
+    renderPagination(totalPages, list);
+  }
+
+  function renderPagination(totalPages, list) {
+    const pag = document.getElementById('pagination');
+    if (totalPages <= 1) { pag.innerHTML = ''; return; }
+    let html = `<button class="page-btn" onclick="changePage(${currentPage-1},event)" ${currentPage===1?'disabled':''}>
+      <i class="fas fa-chevron-left"></i></button>`;
+    for (let i = 1; i <= totalPages; i++) {
+      html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="changePage(${i},event)">${i}</button>`;
+    }
+    html += `<button class="page-btn" onclick="changePage(${currentPage+1},event)" ${currentPage===totalPages?'disabled':''}>
+      <i class="fas fa-chevron-right"></i></button>`;
+    pag.innerHTML = html;
+  }
+
+  function changePage(n, e) {
+    e.stopPropagation();
+    currentPage = n;
+    applyFilters();
+    window.scrollTo({ top: 200, behavior: 'smooth' });
+  }
+
+  function renderActiveFilters() {
+    const el = document.getElementById('activeFilters');
+    let tags = '';
+    if (selectedCategories.length) {
+      selectedCategories.forEach(c => {
+        tags += `<span class="filter-tag">${c} <button onclick="removeCatFilter('${c}')">×</button></span>`;
+      });
+    }
+    if (maxPrice < 1300) tags += `<span class="filter-tag">Max $${maxPrice} <button onclick="resetPrice()">×</button></span>`;
+    el.innerHTML = tags;
+  }
+
+  function removeCatFilter(cat) {
+    const checkbox = document.querySelector(`.cat-filter[value="${cat}"]`);
+    if (checkbox) checkbox.checked = false;
+    applyFilters();
+  }
+  function resetPrice() {
+    document.getElementById('priceRange').value = 1300;
+    updatePriceFilter(1300);
+  }
+  function clearAllFilters() {
+    document.querySelectorAll('.cat-filter').forEach(c => c.checked = false);
+    document.getElementById('priceRange').value = 1300;
+    document.getElementById('priceDisplay').textContent = 'Up to $1,300';
+    maxPrice = 1300;
+    document.querySelector('input[name="ratingFilter"][value="0"]').checked = true;
+    document.getElementById('inStockOnly').checked = false;
+    currentPage = 1;
+    applyFilters();
+  }
+
+  function setView(type) {
+    const grid = document.getElementById('productsGrid');
+    isGridView = type === 'grid';
+    document.getElementById('gridViewBtn').classList.toggle('active', isGridView);
+    document.getElementById('listViewBtn').classList.toggle('active', !isGridView);
+    grid.classList.toggle('list-view', !isGridView);
+  }
+
+  // Initial render
+  applyFilters();
+</script>
+</body>
+</html>

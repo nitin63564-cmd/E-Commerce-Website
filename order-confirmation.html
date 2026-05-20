@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed! - ShopVerse</title>
+  <meta name="description" content="Your order has been successfully placed at ShopVerse. Thank you for shopping with us!">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .confirmation-container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 60px 0;
+    }
+    .success-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .success-animation {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 32px;
+      font-size: 52px;
+      color: white;
+      animation: successPop 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+      box-shadow: 0 0 60px rgba(108,99,255,0.4);
+    }
+    @keyframes successPop {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .success-header h1 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+    .success-header p { color: var(--text-muted); font-size: 16px; }
+
+    .order-number-box {
+      background: var(--card);
+      border: 2px solid var(--primary);
+      border-radius: var(--radius-md);
+      padding: 24px 32px;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .order-number-box .label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .order-number {
+      font-size: 32px; font-weight: 900;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; font-family: monospace;
+      letter-spacing: 2px;
+    }
+    .order-date { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+
+    .confirmation-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 28px; margin-bottom: 24px;
+    }
+    .confirmation-card h3 {
+      font-size: 15px; font-weight: 700; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px; color: var(--text);
+    }
+    .confirmation-card h3 i { color: var(--primary); }
+
+    .order-item-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .order-item-row:last-child { border-bottom: none; }
+    .order-item-img { width: 56px; height: 56px; border-radius: var(--radius-sm); overflow: hidden; flex-shrink: 0; }
+    .order-item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .order-item-info { flex: 1; }
+    .order-item-info h4 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .order-item-info span { font-size: 12px; color: var(--text-muted); }
+    .order-item-price { font-size: 14px; font-weight: 700; color: var(--primary-light); }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .info-item { font-size: 13px; }
+    .info-item .info-label { color: var(--text-muted); margin-bottom: 4px; }
+    .info-item .info-value { font-weight: 600; color: var(--text); }
+
+    .steps-timeline { display: flex; align-items: center; gap: 0; }
+    .timeline-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+    .timeline-step:last-child { flex: 0; }
+    .timeline-icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--primary); display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 16px; margin-bottom: 8px;
+    }
+    .timeline-step:nth-child(3) .timeline-icon,
+    .timeline-step:nth-child(5) .timeline-icon { background: var(--dark-3); color: var(--text-muted); }
+    .timeline-step span { font-size: 11px; color: var(--text-muted); text-align: center; }
+    .timeline-line { flex: 1; height: 2px; background: var(--border); margin-bottom: 24px; }
+    .timeline-line.done { background: var(--primary); }
+
+    .total-breakdown { display: flex; flex-direction: column; gap: 10px; }
+    .total-row { display: flex; justify-content: space-between; font-size: 14px; }
+    .total-row .t-label { color: var(--text-muted); }
+    .total-grand { font-size: 18px; font-weight: 800; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 6px; }
+    .total-grand .t-label { color: var(--text); }
+    .total-grand .t-value { color: var(--primary-light); }
+
+    .action-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
+    .confetti { position: fixed; pointer-events: none; z-index: 9999; }
+  </style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<main>
+  <section class="section" style="background:var(--gradient-hero);min-height:calc(100vh - var(--nav-height))">
+    <div class="container">
+      <div class="confirmation-container">
+
+        <!-- Success Header -->
+        <div class="success-header">
+          <div class="success-animation"><i class="fas fa-check"></i></div>
+          <h1>🎉 Order <span style="color:var(--primary-light)">Confirmed!</span></h1>
+          <p>Thank you for your purchase! Your order has been successfully placed and is being processed.</p>
+        </div>
+
+        <!-- Order Number -->
+        <div class="order-number-box">
+          <div class="label">Your Order Number</div>
+          <div class="order-number" id="orderNumber">#SV00000000</div>
+          <div class="order-date" id="orderDate"></div>
+        </div>
+
+        <!-- Order Tracking -->
+        <div class="confirmation-card">
+          <h3><i class="fas fa-map-marker-alt"></i> Order Status</h3>
+          <div class="steps-timeline">
+            <div class="timeline-step">
+              <div class="timeline-icon"><i class="fas fa-check"></i></div>
+              <span>Order Placed</span>
+            </div>
+            <div class="timeline-line done"></div>
+            <div class="timeline-step">
+              <div class="timeline-icon"><i class="fas fa-box"></i></div>
+              <span>Processing</span>
+            </div>
+            <div class="timeline-line"></div>
+            <div class="timeline-step">
+              <div class="timeline-icon" style="background:var(--dark-3);color:var(--text-muted)"><i class="fas fa-shipping-fast"></i></div>
+              <span>Shipped</span>
+            </div>
+            <div class="timeline-line"></div>
+            <div class="timeline-step">
+              <div class="timeline-icon" style="background:var(--dark-3);color:var(--text-muted)"><i class="fas fa-home"></i></div>
+              <span>Delivered</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="confirmation-card" id="orderItemsCard">
+          <h3><i class="fas fa-shopping-bag"></i> Order Items</h3>
+          <div id="orderItems">
+            <p style="text-align:center;color:var(--text-muted);padding:20px">Loading order details...</p>
+          </div>
+        </div>
+
+        <!-- Order Total -->
+        <div class="confirmation-card" id="orderTotalCard">
+          <h3><i class="fas fa-receipt"></i> Order Total</h3>
+          <div class="total-breakdown" id="orderTotal"></div>
+        </div>
+
+        <!-- Shipping Info -->
+        <div class="confirmation-card" id="shippingInfoCard">
+          <h3><i class="fas fa-truck"></i> Shipping Information</h3>
+          <div class="info-grid" id="shippingInfo"></div>
+        </div>
+
+        <!-- What's Next -->
+        <div class="confirmation-card">
+          <h3><i class="fas fa-info-circle"></i> What Happens Next?</h3>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:flex-start;gap:14px">
+              <div style="width:36px;height:36px;border-radius:50%;background:rgba(108,99,255,0.2);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px"><i class="fas fa-envelope"></i></div>
+              <div><div style="font-weight:600;margin-bottom:3px">Confirmation Email</div><div style="font-size:13px;color:var(--text-muted)">You'll receive an order confirmation email with your order details and tracking information.</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:14px">
+              <div style="width:36px;height:36px;border-radius:50%;background:rgba(67,184,156,0.2);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px"><i class="fas fa-box"></i></div>
+              <div><div style="font-weight:600;margin-bottom:3px">Order Processing</div><div style="font-size:13px;color:var(--text-muted)">We'll start packing your order within 24 hours. You'll receive updates as your order progresses.</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:14px">
+              <div style="width:36px;height:36px;border-radius:50%;background:rgba(247,197,159,0.2);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px"><i class="fas fa-shipping-fast"></i></div>
+              <div><div style="font-weight:600;margin-bottom:3px">Delivery (2-5 days)</div><div style="font-size:13px;color:var(--text-muted)">Your order will be delivered within 2-5 business days. Track your shipment in real-time.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <a href="index.html" class="btn btn-primary btn-lg"><i class="fas fa-home"></i> Back to Home</a>
+          <a href="products.html" class="btn btn-outline btn-lg"><i class="fas fa-shopping-bag"></i> Continue Shopping</a>
+          <button onclick="window.print()" class="btn btn-ghost btn-lg"><i class="fas fa-print"></i> Print Receipt</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-placeholder"></div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+  renderLayout('');
+
+  const order = JSON.parse(localStorage.getItem('lastOrder') || 'null');
+
+  if (order) {
+    // Order number
+    document.getElementById('orderNumber').textContent = '#' + order.orderNumber;
+    document.getElementById('orderDate').textContent = `Placed on ${order.date}`;
+
+    // Items
+    const itemsEl = document.getElementById('orderItems');
+    if (order.items && order.items.length > 0) {
+      itemsEl.innerHTML = order.items.map(item => `
+        <div class="order-item-row">
+          <div class="order-item-img">
+            <img src="${item.image}" alt="${item.name}"
+              onerror="this.src='https://placehold.co/56x56/1A1A35/6C63FF?text=P'">
+          </div>
+          <div class="order-item-info">
+            <h4>${item.name}</h4>
+            <span>${item.category} • Qty: ${item.quantity}</span>
+          </div>
+          <span class="order-item-price">$${(item.price * item.quantity).toFixed(2)}</span>
+        </div>`).join('');
+    } else {
+      itemsEl.innerHTML = '<p style="color:var(--text-muted);text-align:center">No items found</p>';
+    }
+
+    // Total
+    const subtotal = order.items ? order.items.reduce((s,i) => s + i.price*i.quantity, 0) : 0;
+    const tax = subtotal * 0.08;
+    const total = subtotal + tax;
+    document.getElementById('orderTotal').innerHTML = `
+      <div class="total-row"><span class="t-label">Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+      <div class="total-row"><span class="t-label">Shipping</span><span style="color:var(--accent)">FREE</span></div>
+      <div class="total-row"><span class="t-label">Tax (8%)</span><span>$${tax.toFixed(2)}</span></div>
+      <div class="total-row total-grand">
+        <span class="t-label">Total Paid</span>
+        <span class="t-value">$${total.toFixed(2)}</span>
+      </div>`;
+
+    // Shipping
+    if (order.shipping) {
+      const s = order.shipping;
+      document.getElementById('shippingInfo').innerHTML = `
+        <div class="info-item"><div class="info-label">Customer Name</div><div class="info-value">${s.firstName} ${s.lastName}</div></div>
+        <div class="info-item"><div class="info-label">Email</div><div class="info-value">${s.email}</div></div>
+        <div class="info-item"><div class="info-label">Delivery Address</div><div class="info-value">${s.address}, ${s.city}</div></div>
+        <div class="info-item"><div class="info-label">Estimated Delivery</div><div class="info-value">Within 3-5 business days</div></div>`;
+    }
+  } else {
+    // No order found
+    document.getElementById('orderNumber').textContent = '#SV' + Math.floor(Math.random() * 90000000 + 10000000);
+    document.getElementById('orderDate').textContent = `Placed on ${new Date().toLocaleDateString()}`;
+    document.getElementById('orderItems').innerHTML = `<p style="color:var(--text-muted);text-align:center">Order details not available</p>`;
+    document.getElementById('orderTotal').innerHTML = `<div class="total-row total-grand"><span class="t-label">Thank you for your order!</span></div>`;
+    document.getElementById('shippingInfo').innerHTML = `<div class="info-item"><div class="info-value">Shipping details sent to your email.</div></div>`;
+  }
+
+  // Confetti effect
+  function createConfetti() {
+    const colors = ['#6C63FF','#FF6584','#43B89C','#F7C59F','#A78BFA'];
+    for (let i = 0; i < 60; i++) {
+      const el = document.createElement('div');
+      el.style.cssText = `
+        position:fixed; top:-10px; left:${Math.random()*100}vw;
+        width:${Math.random()*8+4}px; height:${Math.random()*8+4}px;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        border-radius:${Math.random()>0.5?'50%':'2px'}; z-index:9999;
+        animation: confettiFall ${Math.random()*2+2}s ease-in forwards;
+        animation-delay:${Math.random()*1}s;
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+  }
+
+  const style = document.createElement('style');
+  style.textContent = `@keyframes confettiFall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }`;
+  document.head.appendChild(style);
+
+  setTimeout(createConfetti, 200);
+</script>
+</body>
+</html>
